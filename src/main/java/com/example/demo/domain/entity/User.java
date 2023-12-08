@@ -30,7 +30,7 @@ public class User implements Serializable {
     private String userPassword;
 
     /**
-     * 邮箱1
+     * 邮箱
      */
     private String email;
 

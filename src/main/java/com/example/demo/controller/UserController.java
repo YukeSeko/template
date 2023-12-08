@@ -30,6 +30,7 @@ import java.util.List;
  */
 @RestController
 @Slf4j
+@RequestMapping("/user")
 public class UserController {
 
     @Resource
@@ -67,14 +68,8 @@ public class UserController {
         return ResultUtils.success(loginUserVO);
     }
 
-
-    /**
-     * 用户注销
-     *
-     * @param request
-     * @return
-     */
     @PostMapping("/logout")
+    @ApiOperation("用户注销")
     public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
         if (request == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -83,27 +78,17 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
-    /**
-     * 获取当前登录用户
-     *
-     * @param request
-     * @return
-     */
-    @GetMapping("/get/login")
+
+    @GetMapping("/getLoginUser")
+    @ApiOperation("获取当前登录用户")
     public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
         User user = userService.getLoginUser(request);
         return ResultUtils.success(userService.getLoginUserVO(user));
     }
 
 
-    /**
-     * 创建用户
-     *
-     * @param userAddRequest
-     * @param request
-     * @return
-     */
     @PostMapping("/add")
+    @ApiOperation("管理员-创建用户")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest, HttpServletRequest request) {
         if (userAddRequest == null) {
@@ -116,14 +101,8 @@ public class UserController {
         return ResultUtils.success(user.getId());
     }
 
-    /**
-     * 删除用户
-     *
-     * @param deleteRequest
-     * @param request
-     * @return
-     */
     @PostMapping("/delete")
+    @ApiOperation("管理员-删除用户")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
@@ -133,14 +112,8 @@ public class UserController {
         return ResultUtils.success(b);
     }
 
-    /**
-     * 更新用户
-     *
-     * @param userUpdateRequest
-     * @param request
-     * @return
-     */
     @PostMapping("/update")
+    @ApiOperation("管理员-更新用户")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest,
             HttpServletRequest request) {
@@ -154,14 +127,9 @@ public class UserController {
         return ResultUtils.success(true);
     }
 
-    /**
-     * 根据 id 获取用户（仅管理员）
-     *
-     * @param id
-     * @param request
-     * @return
-     */
+
     @GetMapping("/get")
+    @ApiOperation("管理员-根据 id 获取用户")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<User> getUserById(long id, HttpServletRequest request) {
         if (id <= 0) {
@@ -172,14 +140,9 @@ public class UserController {
         return ResultUtils.success(user);
     }
 
-    /**
-     * 根据 id 获取包装类
-     *
-     * @param id
-     * @param request
-     * @return
-     */
+
     @GetMapping("/get/vo")
+    @ApiOperation("根据 id 获取包装类")
     public BaseResponse<UserVO> getUserVOById(long id, HttpServletRequest request) {
         BaseResponse<User> response = getUserById(id, request);
         User user = response.getData();
@@ -187,13 +150,14 @@ public class UserController {
     }
 
     /**
-     * 分页获取用户列表（仅管理员）
+     *
      *
      * @param userQueryRequest
      * @param request
      * @return
      */
     @PostMapping("/list/page")
+    @ApiOperation("管理员-分页获取用户列表")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<User>> listUserByPage(@RequestBody UserQueryRequest userQueryRequest,
             HttpServletRequest request) {
@@ -204,14 +168,9 @@ public class UserController {
         return ResultUtils.success(userPage);
     }
 
-    /**
-     * 分页获取用户封装列表
-     *
-     * @param userQueryRequest
-     * @param request
-     * @return
-     */
+
     @PostMapping("/list/page/vo")
+    @ApiOperation("分页获取用户封装列表")
     public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest,
             HttpServletRequest request) {
         if (userQueryRequest == null) {
@@ -229,16 +188,9 @@ public class UserController {
         return ResultUtils.success(userVOPage);
     }
 
-    // endregion
 
-    /**
-     * 更新个人信息
-     *
-     * @param userUpdateMyRequest
-     * @param request
-     * @return
-     */
     @PostMapping("/update/my")
+    @ApiOperation("更新个人信息")
     public BaseResponse<Boolean> updateMyUser(@RequestBody UserUpdateMyRequest userUpdateMyRequest,
             HttpServletRequest request) {
         if (userUpdateMyRequest == null) {

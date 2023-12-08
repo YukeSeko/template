@@ -64,7 +64,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             queryWrapper.eq("userAccount", userAccount);
             long count = this.baseMapper.selectCount(queryWrapper);
             if (count > 0) {
-                throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号或邮箱重复");
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
             }
             // 2. 加密
             String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
