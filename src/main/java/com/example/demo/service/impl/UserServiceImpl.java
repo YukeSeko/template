@@ -13,6 +13,7 @@ import com.example.demo.exception.BusinessException;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.service.UserService;
 import com.example.demo.utils.SqlUtils;
+import com.example.demo.utils.TokenUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -24,7 +25,9 @@ import org.springframework.util.DigestUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.example.demo.constant.UserConstant.USER_LOGIN_STATE;
@@ -38,6 +41,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      */
     private static final String SALT = "YukeSeko";
 
+
+    @Resource
+    private TokenUtils tokenUtils;
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
@@ -104,6 +110,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (user == null) {
             log.info("user login failed, userAccount cannot match userPassword");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
+        }
+        //其他客户端已经登录，重复登录操作
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(USER_LOGIN_STATE + userAccount))){
+            throw new BusinessException(ErrorCode.Other_clients_logged_in);
         }
         // 3. 记录用户的登录态
         request.getSession().setAttribute(USER_LOGIN_STATE, user);
@@ -179,11 +189,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      */
     @Override
     public boolean userLogout(HttpServletRequest request) {
-        if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
+        Object attribute = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = (User) attribute;
+        if (attribute == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
         }
         // 移除登录态
         request.getSession().removeAttribute(USER_LOGIN_STATE);
+        redisTemplate.opsForHash().delete(USER_LOGIN_STATE+user.getUserAccount());
         return true;
     }
 
@@ -194,6 +207,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         LoginUserVO loginUserVO = new LoginUserVO();
         BeanUtils.copyProperties(user, loginUserVO);
+        //存储用户的信息等
+        String token = tokenUtils.generateToken();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("user",user);
+        hashMap.put("token",token);
+        String hashKey = USER_LOGIN_STATE + user.getUserAccount();
+        redisTemplate.opsForHash().putAll(hashKey,hashMap);
+        redisTemplate.opsForHash().getOperations().expire(hashKey,30, TimeUnit.MINUTES);
+        loginUserVO.setToken(token);
         return loginUserVO;
     }
 

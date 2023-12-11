@@ -1,20 +1,13 @@
 package com.example.demo.aop;
 
-import cn.hutool.jwt.JWT;
-import cn.hutool.jwt.JWTUtil;
-
 import com.example.demo.common.BaseResponse;
-import com.example.demo.common.ErrorCode;
-import com.example.demo.exception.BusinessException;
 import com.example.demo.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
 
 /**
  * Token拦截器

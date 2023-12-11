@@ -15,7 +15,8 @@ public enum ErrorCode {
     SYSTEM_ERROR(50000, "系统内部异常"),
     OPERATION_ERROR(50001, "操作失败"),
     API_REQUEST_ERROR(50010,"远程执行代码失败"),
-    API_REQUEST_TIMEOUT_ERROR(50020,"远程执行代码超时");;
+    API_REQUEST_TIMEOUT_ERROR(50020,"远程执行代码超时"),
+    Other_clients_logged_in(50012,"其他客户端已经登录");
 
     /**
      * 状态码
