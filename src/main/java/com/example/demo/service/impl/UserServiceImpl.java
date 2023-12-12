@@ -191,12 +191,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public boolean userLogout(HttpServletRequest request) {
         Object attribute = request.getSession().getAttribute(USER_LOGIN_STATE);
         User user = (User) attribute;
-        if (attribute == null) {
+        if (user == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
         }
         // 移除登录态
         request.getSession().removeAttribute(USER_LOGIN_STATE);
-        redisTemplate.opsForHash().delete(USER_LOGIN_STATE+user.getUserAccount());
+        redisTemplate.delete(USER_LOGIN_STATE+user.getUserAccount());
         return true;
     }
 
