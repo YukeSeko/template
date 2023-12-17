@@ -1,5 +1,6 @@
 package com.example.demo.aop;
 
+import cn.hutool.json.JSONUtil;
 import com.example.demo.common.BaseResponse;
 import com.example.demo.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 
 /**
  * Token拦截器
@@ -39,7 +41,7 @@ public class TokenInterceptor implements HandlerInterceptor {
             //token 过期
             BaseResponse baseResponse = new BaseResponse(50014,null,"Token expired");
             response.setContentType("application/json;charset=utf-8");
-            response.getWriter().println(baseResponse);
+            response.getWriter().println(JSONUtil.parse(baseResponse));
             return false;
         }
         return true;
